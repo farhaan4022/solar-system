@@ -17,15 +17,22 @@ env:
 jobs:
   unit-testing:
     name: Unit Testing
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        nodejs_version: [18, 19, 20]
+        operating_system: [ubuntu-latest, macos-latest]
+        exclude:
+        - nodejs_version: 18
+          operating_system: macos-latest
+    runs-on: ${{ matrix.operating_system }}
     steps:
       - name: CheckOut Repo
         uses: actions/checkout@v5
 
-      - name: Setup Node.js version 18
+      - name: Setup Node.js version ${{ matrix.nodejs_version }}
         uses: actions/setup-node@v5
         with:
-          node-version: 18
+          node-version: ${{ matrix.nodejs_version }}
 
       - name: Install Dependencies
         run: npm install
@@ -36,5 +43,5 @@ jobs:
       - name: Archive test result
         uses: actions/upload-artifact@v4
         with:
-           name: test results
-           path: test-results.xml
+          name: test results
+          path: test-results.xml
